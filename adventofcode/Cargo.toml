@@ -1,0 +1,9 @@
+[package]
+name = "adventofcode"
+version = "0.1.0"
+edition = "2024"
+repository = "https://github.com/BB223/adventofcode"
+authors = ["BB223"]
+
+[dependencies]
+reqwest = { version = "0.12.24", features = ["blocking"] }
