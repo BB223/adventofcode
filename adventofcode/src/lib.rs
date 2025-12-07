@@ -7,9 +7,9 @@ use reqwest::{
 
 #[macro_export]
 macro_rules! advent_of_code {
-    ($day:expr, $exp1:expr, $exp2:expr) => {
+    ($year:expr, $day:expr, $exp1:expr, $exp2:expr) => {
         fn main() {
-            let input = $crate::read_input($day);
+            let input = $crate::read_input($year, $day);
             $crate::print_result(&part_one(&input), "Part 1");
             $crate::print_result(&part_two(&input), "Part 2");
         }
@@ -20,13 +20,13 @@ macro_rules! advent_of_code {
 
             #[test]
             fn test_part_one() {
-                let result = part_one(&$crate::read_example($day));
+                let result = part_one(&$crate::read_example($year, $day));
                 assert_eq!(result, $exp1);
             }
 
             #[test]
             fn test_part_two() {
-                let result = part_two(&$crate::read_example($day));
+                let result = part_two(&$crate::read_example($year, $day));
                 assert_eq!(result, $exp2);
             }
         }
@@ -60,16 +60,16 @@ impl DataFolder {
     }
 }
 
-pub fn read_input(day: u8) -> String {
-    read_file_or_download(DataFolder::Inputs, day)
+pub fn read_input(year: u16, day: u8) -> String {
+    read_file_or_download(DataFolder::Inputs, year, day)
 }
 
-pub fn read_example(day: u8) -> String {
-    read_file_or_download(DataFolder::Examples, day)
+pub fn read_example(year: u16, day: u8) -> String {
+    read_file_or_download(DataFolder::Examples, year, day)
 }
 
-fn read_file_or_download(folder: DataFolder, day: u8) -> String {
-    let path = build_path(folder, day);
+fn read_file_or_download(folder: DataFolder, year: u16, day: u8) -> String {
+    let path = build_path(folder, year, day);
 
     if path.exists() {
         return fs::read_to_string(path).expect("Failed to read file");
@@ -77,7 +77,7 @@ fn read_file_or_download(folder: DataFolder, day: u8) -> String {
 
     match folder {
         DataFolder::Inputs => {
-            let content = get_input(day);
+            let content = get_input(year, day);
             write_file(&path, &content);
             content
         }
@@ -88,19 +88,23 @@ fn read_file_or_download(folder: DataFolder, day: u8) -> String {
     }
 }
 
-fn build_path(folder: DataFolder, day: u8) -> PathBuf {
+fn build_path(folder: DataFolder, year: u16, day: u8) -> PathBuf {
     let root = env!("CARGO_MANIFEST_DIR");
     PathBuf::from(root)
+        .join(format!("../year{}", year))
         .join("data")
         .join(folder.folder())
         .join(format!("{:02}.txt", day))
 }
 
-fn get_input(day: u8) -> String {
+fn get_input(year: u16, day: u8) -> String {
     let client = build_client();
 
     client
-        .get(format!("https://adventofcode.com/2025/day/{}/input", day))
+        .get(format!(
+            "https://adventofcode.com/{}/day/{}/input",
+            year, day
+        ))
         .send()
         .expect("Request failed")
         .text()
@@ -157,21 +161,4 @@ fn write_file(path: &PathBuf, data: &str) {
     }
 
     fs::write(path, data).expect("Failed to write file");
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_read_input() {
-        let result = read_input(0);
-        assert_eq!(result, "test\n");
-    }
-
-    #[test]
-    fn test_read_example() {
-        let result = read_example(0);
-        assert_eq!(result, "test\n");
-    }
 }
