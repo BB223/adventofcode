@@ -5,17 +5,17 @@ use itertools::Itertools;
 pub fn part_one(input: &str) -> Option<u64> {
     let mut distances = HashMap::new();
     let mut circuites = vec![];
-    let junktion_boxes = input
+    let junction_boxes = input
         .lines()
-        .flat_map(|junktion_box| {
-            junktion_box
+        .flat_map(|junction_box| {
+            junction_box
                 .split(",")
                 .flat_map(|coord| coord.parse::<i64>().ok())
                 .collect_tuple::<(i64, i64, i64)>()
         })
         .collect_vec();
-    for (i, (x, y, z)) in junktion_boxes.iter().enumerate() {
-        for (j, (a, b, c)) in junktion_boxes.iter().enumerate().skip(i + 1) {
+    for (i, (x, y, z)) in junction_boxes.iter().enumerate() {
+        for (j, (a, b, c)) in junction_boxes.iter().enumerate().skip(i + 1) {
             let distance = f64::sqrt(((x - a).pow(2) + (y - b).pow(2) + (z - c).pow(2)) as f64);
             distances.insert((i, j), distance);
         }
@@ -94,32 +94,32 @@ fn overlaps(circuite_a: &[usize], circuite_b: &[usize]) -> bool {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut distances = HashMap::new();
-    let junktion_boxes = input
+    let junction_boxes = input
         .lines()
-        .flat_map(|junktion_box| {
-            junktion_box
+        .flat_map(|junction_box| {
+            junction_box
                 .split(",")
                 .flat_map(|coord| coord.parse::<i64>().ok())
                 .collect_tuple::<(i64, i64, i64)>()
         })
         .collect_vec();
     let mut circuites = vec![];
-    for i in 0..junktion_boxes.len() {
+    for i in 0..junction_boxes.len() {
         circuites.push(vec![i]);
     }
-    for (i, (x, y, z)) in junktion_boxes.iter().enumerate() {
-        for (j, (a, b, c)) in junktion_boxes.iter().enumerate().skip(i + 1) {
+    for (i, (x, y, z)) in junction_boxes.iter().enumerate() {
+        for (j, (a, b, c)) in junction_boxes.iter().enumerate().skip(i + 1) {
             let distance = f64::sqrt(((x - a).pow(2) + (y - b).pow(2) + (z - c).pow(2)) as f64);
             distances.insert((i, j), distance);
         }
     }
-    let ding = distances
+    let sorted_distances = distances
         .iter()
         .sorted_by(|(_, v), (_, v2)| v.total_cmp(v2))
         .collect_vec();
 
     let mut last = (0, 0);
-    for (k, _) in ding {
+    for (k, _) in sorted_distances {
         if !add_circuites(&mut circuites, *k) {
             circuites.push(vec![k.0, k.1]);
         }
@@ -129,7 +129,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             break;
         }
     }
-    let solution = junktion_boxes[last.0].0 * junktion_boxes[last.1].0;
+    let solution = junction_boxes[last.0].0 * junction_boxes[last.1].0;
     Some(solution as u64)
 }
 
