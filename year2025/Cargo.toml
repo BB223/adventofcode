@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 adventofcode = { version = "0.1.0", path = "../adventofcode" }
+itertools = "0.14.0"
